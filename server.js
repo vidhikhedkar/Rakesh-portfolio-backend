@@ -20,6 +20,10 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+app.get('/', (req, res) => {
+    res.status(200).json({ message: 'API is running successfully!' });
+});
+
 // Register Routes
 app.use('/api/home', homeRoutes);
 app.use('/api/about', aboutRoutes);
@@ -36,3 +40,4 @@ mongoose.connect(process.env.MONGO_URI)
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
     .catch((err) => console.error('Database connection error:', err));
+
