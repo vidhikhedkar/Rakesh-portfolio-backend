@@ -4,7 +4,7 @@ const About = require("../models/About");
 const getAboutData = async (req, res) => {
   try {
     let aboutData = await About.findOne();
-    
+
     if (!aboutData) {
       aboutData = await About.create({
         fullName: "Rakesh Parvathneni",
@@ -36,7 +36,16 @@ const getAboutData = async (req, res) => {
 // @desc    Update about/profile information
 const updateAboutData = async (req, res) => {
   try {
-    const { fullName, title, bio, imageUrl, experiences, education } = req.body;
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
+    const {
+      fullName,
+      title,
+      bio,
+      experiences,
+      education
+    } = req.body;
 
     let aboutData = await About.findOne();
 
@@ -47,14 +56,37 @@ const updateAboutData = async (req, res) => {
     aboutData.fullName = fullName;
     aboutData.title = title;
     aboutData.bio = bio;
-    aboutData.imageUrl = imageUrl;
-    aboutData.experiences = experiences;
-    aboutData.education = education;
+
+    // FormData sends these as strings
+    if (experiences) {
+      aboutData.experiences = JSON.parse(experiences);
+    }
+
+    if (education) {
+      aboutData.education = JSON.parse(education);
+    }
+
+    // If a new image was uploaded
+    if (req.file) {
+      const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+
+      aboutData.imageUrl = imageUrl;
+    }
 
     const updatedData = await aboutData.save();
-    res.status(200).json({ message: "About section updated successfully!", data: updatedData });
+
+    res.status(200).json({
+      message: "About section updated successfully!",
+      data: updatedData
+    });
+
   } catch (error) {
-    res.status(500).json({ error: "Server error while updating about data" });
+    console.error("UPDATE ABOUT ERROR:", error);
+
+    res.status(500).json({
+      error: "Server error while updating about data",
+      details: error.message
+    });
   }
 };
 

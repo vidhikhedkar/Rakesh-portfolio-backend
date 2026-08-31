@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { getAboutData, updateAboutData } = require("../controllers/aboutController");
 
-// Route: GET /api/about
+const {
+    getAboutData,
+    updateAboutData
+} = require("../controllers/aboutController");
+
+const upload = require("../middleware/upload");
+
 router.get("/", getAboutData);
 
-// Route: PUT /api/about
-router.put("/", updateAboutData);
+router.put("/", upload.single("image"), updateAboutData);
 
 module.exports = router;
