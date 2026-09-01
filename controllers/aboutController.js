@@ -1,7 +1,8 @@
 const About = require("../models/About");
 const cloudinary = require("../utils/cloudinary");
 
-// @desc    Get about/profile information
+
+// Get about/profile information
 const getAboutData = async (req, res) => {
   try {
     let aboutData = await About.findOne();
@@ -53,7 +54,8 @@ const getAboutData = async (req, res) => {
 };
 
 
-// @desc    Update about/profile information
+
+// Update about/profile information
 const updateAboutData = async (req, res) => {
   try {
     console.log("BODY:", req.body);
@@ -77,7 +79,6 @@ const updateAboutData = async (req, res) => {
     aboutData.title = title;
     aboutData.bio = bio;
 
-    // Parse FormData JSON strings
     if (experiences) {
       aboutData.experiences = JSON.parse(experiences);
     }
@@ -86,7 +87,6 @@ const updateAboutData = async (req, res) => {
       aboutData.education = JSON.parse(education);
     }
 
-    // Upload new image to Cloudinary
     if (req.file) {
       const uploadResult = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -102,17 +102,12 @@ const updateAboutData = async (req, res) => {
             }
           }
         );
-
         stream.end(req.file.buffer);
       });
-
       console.log("CLOUDINARY RESULT:", uploadResult);
-
       aboutData.imageUrl = uploadResult.secure_url;
     }
-
     const updatedData = await aboutData.save();
-
     res.status(200).json({
       message: "About section updated successfully!",
       data: updatedData,
@@ -120,7 +115,6 @@ const updateAboutData = async (req, res) => {
 
   } catch (error) {
     console.error("UPDATE ABOUT ERROR:", error);
-
     res.status(500).json({
       error: "Server error while updating about data",
       details: error.message,
@@ -129,7 +123,4 @@ const updateAboutData = async (req, res) => {
 };
 
 
-module.exports = {
-  getAboutData,
-  updateAboutData,
-};
+module.exports = { getAboutData, updateAboutData, };

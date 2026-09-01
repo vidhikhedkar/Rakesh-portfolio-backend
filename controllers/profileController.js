@@ -5,7 +5,6 @@ const cloudinary = require('../utils/cloudinary');
 const getProfile = async (req, res) => {
     try {
         let profile = await Profile.findOne();
-
         if (!profile) {
             profile = {
                 name: '',
@@ -25,15 +24,12 @@ const getProfile = async (req, res) => {
             };
         }
 
-        // Make sure certification is always an array
         if (!Array.isArray(profile.certification)) {
             profile.certification = profile.certification
                 ? [profile.certification]
                 : [];
         }
-
         res.status(200).json(profile);
-
     } catch (err) {
         console.error('Get Profile Error:', err);
 
@@ -57,15 +53,14 @@ const updateProfile = async (req, res) => {
             tools,
             certification
         } = req.body;
+        // console.log('REQUEST BODY:', req.body);
+        // console.log('AVATAR TYPE:', typeof req.body.avatar);
+        // console.log(
+        //     'AVATAR START:',
+        //     req.body.avatar?.substring(0, 50)
+        // );
 
-        console.log('REQUEST BODY:', req.body);
-        console.log('AVATAR TYPE:', typeof req.body.avatar);
-        console.log(
-            'AVATAR START:',
-            req.body.avatar?.substring(0, 50)
-        );
 
-        // Parse JSON fields safely
         const parsedExperience =
             typeof experience === 'string'
                 ? JSON.parse(experience)
@@ -91,14 +86,13 @@ const updateProfile = async (req, res) => {
                 ? JSON.parse(certification)
                 : certification;
 
-        // Certification must always be an array
         if (!Array.isArray(parsedCertification)) {
             parsedCertification = parsedCertification
                 ? [parsedCertification]
                 : [];
         }
 
-        // Find existing profile
+
         let profile = await Profile.findOne();
 
         if (!profile) {
@@ -120,19 +114,10 @@ const updateProfile = async (req, res) => {
             });
         }
 
-        // Basic fields
         profile.name = name || '';
         profile.handle = handle || '';
         profile.about = about || '';
-
-
-        // ==========================================
-        // AVATAR
-        // ==========================================
-
         if (req.body.avatar) {
-
-            // Already a Cloudinary URL
             if (
                 req.body.avatar.startsWith(
                     'https://res.cloudinary.com/'
@@ -140,15 +125,13 @@ const updateProfile = async (req, res) => {
             ) {
                 profile.avatar = req.body.avatar;
             }
-
-            // Base64 image
             else if (
                 req.body.avatar.startsWith('data:image/')
             ) {
 
-                console.log(
-                    'Uploading avatar to Cloudinary...'
-                );
+                // console.log(
+                //     'Uploading avatar to Cloudinary...'
+                // );
 
                 const uploadedImage =
                     await cloudinary.uploader.upload(
@@ -159,18 +142,16 @@ const updateProfile = async (req, res) => {
                         }
                     );
 
-                console.log(
-                    'Cloudinary Avatar URL:',
-                    uploadedImage.secure_url
-                );
+                // console.log(
+                //     'Cloudinary Avatar URL:',
+                //     uploadedImage.secure_url
+                // );
 
                 profile.avatar =
                     uploadedImage.secure_url;
             }
         }
 
-
-        // Experience
         profile.experience =
             parsedExperience || {
                 duration: '',
@@ -179,54 +160,41 @@ const updateProfile = async (req, res) => {
                 description: ''
             };
 
-
-        // Education
         profile.education =
             Array.isArray(parsedEducation)
                 ? parsedEducation
                 : [];
 
-
-        // Skills
         profile.skills =
             Array.isArray(parsedSkills)
                 ? parsedSkills
                 : [];
 
-
-        // Tools
         profile.tools =
             Array.isArray(parsedTools)
                 ? parsedTools
                 : [];
 
-
-        // Certification
         profile.certification =
             parsedCertification;
 
-
-        // Save
         const updatedProfile =
             await profile.save();
 
-        console.log(
-            'UPDATED PROFILE:',
-            updatedProfile
-        );
+        // console.log(
+        //     'UPDATED PROFILE:',
+        //     updatedProfile
+        // );
 
         res.status(200).json({
             message: 'Data edited successfully!',
             data: updatedProfile
         });
-
     } catch (err) {
-
         console.error(
             'UPDATE PROFILE ERROR:',
             err
         );
-
         res.status(500).json({
             message:
                 err.message ||
@@ -236,7 +204,4 @@ const updateProfile = async (req, res) => {
 };
 
 
-module.exports = {
-    getProfile,
-    updateProfile
-};
+module.exports = { getProfile, updateProfile };

@@ -2,6 +2,7 @@ const HomeContent = require('../models/HomeContent');
 const cloudinary = require('../utils/cloudinary');
 const streamifier = require('streamifier');
 
+
 // Helper function to upload buffer stream to Cloudinary
 const uploadToCloudinary = (fileBuffer) => {
     return new Promise((resolve, reject) => {
@@ -18,6 +19,7 @@ const uploadToCloudinary = (fileBuffer) => {
         streamifier.createReadStream(fileBuffer).pipe(stream);
     });
 };
+
 
 // Get data
 exports.getHomeContent = async (req, res) => {
@@ -40,7 +42,8 @@ exports.getHomeContent = async (req, res) => {
     }
 };
 
-// Update data (handles text fields and file stream)
+
+// Update data 
 exports.updateHomeContent = async (req, res) => {
     try {
         const {
@@ -60,8 +63,6 @@ exports.updateHomeContent = async (req, res) => {
         if (!content) {
             content = new HomeContent({});
         }
-
-        // Upload image to Cloudinary if file is attached
         if (req.file) {
             const cloudinaryResponse = await uploadToCloudinary(req.file.buffer);
             content.imageUrl = cloudinaryResponse.secure_url;
@@ -76,13 +77,10 @@ exports.updateHomeContent = async (req, res) => {
         if (totalProjectsCount !== undefined) content.totalProjectsCount = totalProjectsCount;
         if (tickerText !== undefined) content.tickerText = tickerText;
         if (ctaHeading !== undefined) content.ctaHeading = ctaHeading;
-
         if (services !== undefined) {
             content.services = typeof services === 'string' ? JSON.parse(services) : services;
         }
-
         const updatedContent = await content.save();
-
         res.status(200).json({
             success: true,
             message: "Home content updated successfully",

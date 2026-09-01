@@ -1,5 +1,6 @@
 import Project from "../models/Project.js";
 
+
 export const getProjects = async (req, res) => {
     try {
         const projects = await Project.find().sort({ order: 1 });
@@ -11,15 +12,13 @@ export const getProjects = async (req, res) => {
     }
 };
 
+
 export const updateProjects = async (req, res) => {
     try {
-        const { projects } = req.body; // Expects an array of projects
-        console.log("Incoming Projects Update:", projects);
-
-        // Clear existing and replace, or bulk upsert
+        const { projects } = req.body; 
+        // console.log("Incoming Projects Update:", projects);
         await Project.deleteMany({});
         const savedProjects = await Project.insertMany(projects);
-
         res.status(200).json(savedProjects);
     } catch (error) {
         console.error("Error updating projects:", error);
