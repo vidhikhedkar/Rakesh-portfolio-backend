@@ -4,8 +4,8 @@ const cloudinary = require("cloudinary").v2;
 
 const {
     getProjects,
+    createProject,
     getProjectDetail,
-    updateProjects,
     updateProjectDetail,
     deleteProjectDetail,
 } = require("../controllers/projectController");
@@ -44,19 +44,16 @@ router.get("/", getProjects);
 
 
 // ============================================================
-// UPDATE PROJECT LIST
-// PUT /api/projects
+// CREATE NEW PROJECT
+// POST /api/projects
 // ============================================================
 
-router.put("/", updateProjects);
+router.post("/", createProject);
 
 
 // ============================================================
 // CLOUDINARY IMAGE UPLOAD
 // POST /api/projects/upload
-// ============================================================
-// IMPORTANT:
-// Keep this BEFORE /:id
 // ============================================================
 
 router.post(
@@ -64,9 +61,7 @@ router.post(
     upload.single("image"),
     async (req, res) => {
         try {
-            console.log(
-                "UPLOAD REQUEST RECEIVED"
-            );
+            console.log("UPLOAD REQUEST RECEIVED");
 
             if (!req.file) {
                 return res.status(400).json({
